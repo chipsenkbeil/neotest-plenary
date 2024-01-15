@@ -92,13 +92,14 @@ function PlenaryNeotestAdapter.build_spec(args)
     end
   end
 
-  ---@type boolean
-  local debug_mode = true
-  --local debug_mode = config.debug or false
-
-  -- Can be a string (path to file) or array of globs
-  ---@type string|string[]|nil
+  -- Can be a string (path to file), an array of globs, or a function
+  -- that will receive the cwd and return the path to the min_init
+  ---@type nil|string|string[]|fun(cwd:string):string|string[]
   local min_init = config.min_init
+
+  -- Load up the current working directory, which is used as the base of our test path
+  -- when performing globs
+  local cwd = assert(vim.loop.cwd())
 
   -- If no min_init provided, set a default of globals
   if not min_init then
@@ -109,39 +110,26 @@ function PlenaryNeotestAdapter.build_spec(args)
     }
   end
 
+  -- If working with a function, invoke it to get the min_init
+  if type(min_init) == "function" then
+    min_init = min_init(cwd)
+  end
+
   -- If working with list of strings, treat as globs and find
   -- the first match we can
   if type(min_init) == "table" then
     for _, pattern in ipairs(min_init) do
-      if debug_mode then
-        local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
-        f:write("Looking for min_init using pattern: " .. pattern .. "\n")
-        f:close()
-      end
-
       local glob_matches = async.fn.glob(pattern, true, true)
       if #glob_matches > 0 then
         min_init = glob_matches[1]
         break
       end
-
-      if debug_mode then
-        local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
-        f:write("Nothing found for " .. pattern)
-        f:close()
-      end
     end
   end
 
   -- If we did not find anything from globs, then unset the min_init path
-  if type(min_init) == "table" then
+  if type(min_init) ~= "string" then
     min_init = nil
-  end
-
-  if debug_mode and min_init then
-    local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
-    f:write("Using min_init: " .. min_init .. "\n")
-    f:close()
   end
 
   -- the local path to the plenary.nvim plugin installed
@@ -150,7 +138,6 @@ function PlenaryNeotestAdapter.build_spec(args)
     debug.getinfo(require("plenary.path").__index).source:match("@?(.*[/\\])"), ":p:h:h:h"
   )
 
-  local cwd = assert(vim.loop.cwd())
   local command = vim.tbl_flatten({
     vim.loop.exepath(),
     "--headless",
