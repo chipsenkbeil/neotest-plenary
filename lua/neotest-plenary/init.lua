@@ -127,6 +127,11 @@ function PlenaryNeotestAdapter.build_spec(args)
     end
   end
 
+  -- If we did not find anything from globs, then unset the min_init path
+  if type(min_init) == "table" then
+    min_init = nil
+  end
+
   if debug_mode and min_init then
     local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
     f:write("Using min_init: " .. min_init)
