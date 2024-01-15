@@ -113,7 +113,7 @@ function PlenaryNeotestAdapter.build_spec(args)
   if type(min_init) == "table" then
     for _, pattern in ipairs(min_init) do
       if debug_mode then
-        print("Looking for min_init using pattern: ", pattern)
+        vim.notify("Looking for min_init using pattern: " .. pattern, vim.log.levels.DEBUG)
       end
 
       local glob_matches = async.fn.glob(pattern, true, true)
@@ -125,7 +125,7 @@ function PlenaryNeotestAdapter.build_spec(args)
   end
 
   if debug_mode and min_init then
-    print("Using min_init: ", min_init)
+    error("Using min_init: " .. min_init)
   end
 
   -- the local path to the plenary.nvim plugin installed
