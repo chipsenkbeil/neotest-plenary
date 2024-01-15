@@ -93,7 +93,8 @@ function PlenaryNeotestAdapter.build_spec(args)
   end
 
   ---@type boolean
-  local debug_mode = config.debug or false
+  local debug_mode = true
+  --local debug_mode = config.debug or false
 
   -- Can be a string (path to file) or array of globs
   ---@type string|string[]|nil
@@ -113,7 +114,9 @@ function PlenaryNeotestAdapter.build_spec(args)
   if type(min_init) == "table" then
     for _, pattern in ipairs(min_init) do
       if debug_mode then
-        vim.notify("Looking for min_init using pattern: " .. pattern, vim.log.levels.DEBUG)
+        local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
+        f:write("Looking for min_init using pattern: " .. pattern)
+        f:close()
       end
 
       local glob_matches = async.fn.glob(pattern, true, true)
@@ -125,7 +128,9 @@ function PlenaryNeotestAdapter.build_spec(args)
   end
 
   if debug_mode and min_init then
-    error("Using min_init: " .. min_init)
+    local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
+    f:write("Using min_init: " .. min_init)
+    f:close()
   end
 
   -- the local path to the plenary.nvim plugin installed
