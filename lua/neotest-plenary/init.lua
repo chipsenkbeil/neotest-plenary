@@ -115,7 +115,7 @@ function PlenaryNeotestAdapter.build_spec(args)
     for _, pattern in ipairs(min_init) do
       if debug_mode then
         local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
-        f:write("Looking for min_init using pattern: " .. pattern)
+        f:write("Looking for min_init using pattern: " .. pattern .. "\n")
         f:close()
       end
 
@@ -123,6 +123,12 @@ function PlenaryNeotestAdapter.build_spec(args)
       if #glob_matches > 0 then
         min_init = glob_matches[1]
         break
+      end
+
+      if debug_mode then
+        local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
+        f:write("Nothing found for " .. pattern)
+        f:close()
       end
     end
   end
@@ -134,7 +140,7 @@ function PlenaryNeotestAdapter.build_spec(args)
 
   if debug_mode and min_init then
     local f = assert(io.open("/tmp/test.log", "a+"), "Failed to pen log file")
-    f:write("Using min_init: " .. min_init)
+    f:write("Using min_init: " .. min_init .. "\n")
     f:close()
   end
 
