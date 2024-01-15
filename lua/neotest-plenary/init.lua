@@ -17,10 +17,10 @@ local function join_results(base_result, update)
     return base_result or update
   end
   local status = (base_result.status == "failed" or update.status == "failed") and "failed"
-    or "passed"
+      or "passed"
   local errors = (base_result.errors or update.errors)
       and (vim.list_extend(base_result.errors or {}, update.errors or {}))
-    or nil
+      or nil
   return {
     status = status,
     errors = errors,
@@ -59,7 +59,7 @@ function PlenaryNeotestAdapter.discover_positions(path)
   ;; async it blocks (async.it)
   ((function_call
       name: (
-        dot_index_expression 
+        dot_index_expression
           field: (identifier) @func_name
       )
       arguments: (arguments (_) @test.name (function_definition))
@@ -118,7 +118,7 @@ function PlenaryNeotestAdapter.build_spec(args)
     vim.loop.exepath(),
     "--headless",
     "-i", "NONE", -- no shada
-    "-n", -- no swpafile, always in-memory
+    "-n",         -- no swpafile, always in-memory
     "--noplugin",
     -- add plenary.nvim to &runtimepath (should be available before init config)
     "--cmd", ([[lua vim.opt.runtimepath:prepend('%s')]]):format(vim.fn.escape(plenary_dir, " '")),
@@ -127,9 +127,9 @@ function PlenaryNeotestAdapter.build_spec(args)
     "-u", min_init or "NONE",
     "-c", "source " .. test_script,
     "-c", "lua _run_tests({results = '" .. results_path .. "', file = '" .. async.fn.escape(
-      pos.path,
-      "'"
-    ) .. "', filter = " .. vim.inspect(filters) .. "})",
+    pos.path,
+    "'"
+  ) .. "', filter = " .. vim.inspect(filters) .. "})",
   })
   return {
     command = command,
@@ -143,15 +143,15 @@ end
 ---@param result PlenaryTestResult
 local function convert_plenary_result(result, status, file)
   return table.concat(vim.tbl_flatten({ file, result.descriptions }), "::"),
-    {
-      status = status,
-      short = result.msg,
-      errors = result.msg and {
-        {
-          message = result.msg,
+      {
+        status = status,
+        short = result.msg,
+        errors = result.msg and {
+          {
+            message = result.msg,
+          },
         },
-      },
-    }
+      }
 end
 
 ---@param lists string[][]
