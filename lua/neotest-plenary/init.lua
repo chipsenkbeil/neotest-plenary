@@ -91,14 +91,24 @@ function PlenaryNeotestAdapter.build_spec(args)
       table.insert(filters, 1, parent_pos.range[1])
     end
   end
+
+  -- Can be a string (path to file) or array of globs
+  ---@type string|string[]|nil
   local min_init = config.min_init
+
+  -- If no min_init provided, set a default of globals
   if not min_init then
-    local globs = {
+    min_init = {
       ("**%stestrc*"):format(lib.files.sep),
       ("**%sminimal_init*"):format(lib.files.sep),
       ("test*%sinit.vim"):format(lib.files.sep),
     }
-    for _, pattern in ipairs(globs) do
+  end
+
+  -- If working with list of strings, treat as globs and find
+  -- the first match we can
+  if type(min_init) == "table" then
+    for _, pattern in ipairs(min_init) do
       local glob_matches = async.fn.glob(pattern, true, true)
       if #glob_matches > 0 then
         min_init = glob_matches[1]
